@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff5d9">
+<title>十二星座占い</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap');
+:root{--ink:#171313;--pink:#f4b5c6;--pink-light:#fff0f4;--yellow:#ffd447;--cream:#fffdf5;--line:#e7aebd;--mint:#eaf6ed;--lav:#f2edfb}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;background-color:#fff7e7;background-image:radial-gradient(#efc5d0 1.1px,transparent 1.1px),radial-gradient(#fff 1.3px,transparent 1.3px);background-size:18px 18px,36px 36px;background-position:0 0,9px 9px}
+.wrap{max-width:900px;margin:0 auto;padding:28px 16px 40px}
+.paper{position:relative;background:var(--cream);border:3px solid #e8afbf;border-radius:27px;padding:clamp(20px,4vw,40px);box-shadow:0 7px 0 #e9c6cf,0 14px 30px #b77b8b22;overflow:hidden}
+.paper:before,.paper:after{content:'✦';position:absolute;color:#e9bd43;font-size:25px}.paper:before{top:13px;left:17px}.paper:after{right:17px;bottom:12px}
+.title{text-align:center;font-size:clamp(32px,6vw,49px);font-weight:900;letter-spacing:.08em;margin:0 0 8px;color:#171313;text-shadow:2px 2px 0 #f8d9e2}
+.title:after{content:' ♡';font-size:.55em;color:#df8ca6}
+.week{text-align:center;font-size:12px;color:#171313;background:#fff0f3;border:1px dashed #d99aac;border-radius:99px;padding:7px 15px;width:max-content;max-width:100%;margin:0 auto 22px}
+.sign-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 auto 23px;max-width:720px}
+.sign-btn{border:1.5px solid #e2b5c1;background:#fff;border-radius:13px;padding:9px 4px;color:#171313;font:inherit;cursor:pointer;min-width:0;transition:transform .15s,background .15s}
+.sign-btn:hover{transform:translateY(-2px);background:#fff0f4}.sign-btn[aria-pressed="true"]{background:#f8dce5;border:2px solid #d88da5;box-shadow:0 3px 0 #e7bdc9}
+.glyph{display:block;font-size:21px;line-height:1.3;color:#171313}.name{display:block;font-size:11px;font-weight:700;margin-top:3px}
+.selected{text-align:center;margin:0 auto 17px}.selected h2{font-size:clamp(23px,4vw,32px);margin:0;font-weight:900;letter-spacing:.06em;color:#171313}
+.fortunes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fortune{background:#fff;border:1.5px solid #ead0d6;border-radius:16px;padding:14px 17px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 3px 0 #f3e4e6}
+.fortune:nth-child(2){background:#fffdf4}.fortune:nth-child(3){background:#f6fffa}.fortune:nth-child(4){background:#faf7ff}
+.label{font-weight:700;font-size:15px;color:#171313}.stars{white-space:nowrap;color:#f3c32f;font-size:23px;letter-spacing:1px;text-shadow:0 1px 0 #d7a92c}.empty{display:none}
+.lucky{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:17px}
+.lucky-card{background:#fff0f4;border:1.5px dashed #dfa6b6;border-radius:15px;padding:13px 16px;text-align:center}.lucky-card:nth-child(2){background:#f1faf5;border-color:#a9cdb9}
+.lucky-label{font-size:12px;color:#171313;font-weight:700;letter-spacing:.06em}.lucky-value{font-size:20px;font-weight:900;margin-top:4px;color:#171313}
+.bottom{text-align:center;margin-top:25px;color:#171313;font-size:15px;font-weight:900;letter-spacing:.15em}.bottom span{color:#e9bd43}
+@media(max-width:560px){.wrap{padding:14px 10px 26px}.paper{padding:27px 13px 29px;border-radius:22px}.sign-grid{grid-template-columns:repeat(4,1fr);gap:7px}.sign-btn{padding:8px 3px}.fortune{padding:12px 10px;display:block}.label{font-size:13px}.stars{display:block;font-size:21px;margin-top:4px}.lucky-value{font-size:18px}}
+</style>
+</head>
+<body>
+<main class="wrap"><section class="paper">
+  <h1 class="title">十二星座占い</h1>
+  <div class="week" id="week"></div>
+  <nav class="sign-grid" id="signs" aria-label="星座を選ぶ"></nav>
+  <section class="selected"><h2 id="heading">牡羊座の運勢</h2></section>
+  <section class="fortunes" id="fortunes" aria-label="運勢"></section>
+  <section class="lucky" id="lucky"></section>
+  <div class="bottom"><span>✦</span> HAVE A HAPPY WEEK! <span>✦</span></div>
+</section></main>
+<script>
+const labels=['勉強運','行楽運','健康運','恋愛運'];
+const signs=[
+ {name:'牡羊座',g:'♈'}, {name:'牡牛座',g:'♉'}, {name:'双子座',g:'♊'}, {name:'蟹座',g:'♋'},
+ {name:'獅子座',g:'♌'}, {name:'乙女座',g:'♍'}, {name:'天秤座',g:'♎'}, {name:'蠍座',g:'♏'},
+ {name:'射手座',g:'♐'}, {name:'山羊座',g:'♑'}, {name:'水瓶座',g:'♒'}, {name:'魚座',g:'♓'}
+];
+const colors=['さくらピンク','ミルクティー','レモンイエロー','ベビーブルー','コーラルピンク','ミントグリーン','ラベンダー','ボルドー','オレンジ','アイボリー','アクアブルー','ローズピンク','ピーチ','サックスブルー','クリーム','チェリーレッド','ライラック','パールホワイト'];
+const items=['リボン','カーディガン','ヘアピン','ワンピース','バッグ','ハンカチ','ネックレス','ブーツ','帽子','ベルト','スニーカー','ブラウス','スカート','ポーチ','ヘアクリップ','ブローチ','腕時計','ミニバッグ'];
+// 2026年11月23日（月）から26週分。毎週月曜日に次の内容へ切り替わります。
+const firstMonday=new Date(2026,10,23);
+const weeks=Array.from({length:26},(_,w)=>signs.map((s,i)=>({
+ name:s.name,
+ scores:[0,1,2,3].map((k)=>2+((w*3+i*2+k*3+Math.floor((w+i)/4))%4)),
+ color:colors[(w*5+i*7)%colors.length],
+ item:items[(w*7+i*5+Math.floor(w/3))%items.length]
+})));
+const nav=document.getElementById('signs');
+signs.forEach((s,i)=>{const b=document.createElement('button');b.className='sign-btn';b.type='button';b.setAttribute('aria-pressed',i===0?'true':'false');b.innerHTML=`<span class="glyph">${s.g}</span><span class="name">${s.name}</span>`;b.addEventListener('click',()=>show(i));nav.appendChild(b)});
+function currentWeek(){const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const monday=new Date(today);monday.setDate(today.getDate()-((today.getDay()+6)%7));const elapsed=Math.floor((monday-firstMonday)/(7*86400000));return ((elapsed%weeks.length)+weeks.length)%weeks.length;}
+function weekText(){const now=new Date();const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate());monday.setDate(monday.getDate()-((monday.getDay()+6)%7));const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);const fmt=d=>`${d.getMonth()+1}/${d.getDate()}`;return `${now.getFullYear()}年 ${fmt(monday)} — ${fmt(sunday)}`;}
+function show(i){const s=weeks[currentWeek()][i];document.getElementById('heading').textContent=s.name+'の運勢';document.querySelectorAll('.sign-btn').forEach((b,j)=>b.setAttribute('aria-pressed',j===i?'true':'false'));document.getElementById('fortunes').innerHTML=labels.map((label,j)=>`<div class="fortune"><span class="label">${label}</span><span class="stars" aria-label="${s.scores[j]}つ星">${'★'.repeat(s.scores[j])}</span></div>`).join('');document.getElementById('lucky').innerHTML=`<div class="lucky-card"><div class="lucky-label">ラッキーカラー</div><div class="lucky-value">${s.color}</div></div><div class="lucky-card"><div class="lucky-label">ラッキーアイテム</div><div class="lucky-value">${s.item}</div></div>`;}
+document.getElementById('week').textContent=weekText();show(0);
+</script>
+</body></html>
